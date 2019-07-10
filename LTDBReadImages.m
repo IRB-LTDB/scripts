@@ -4,6 +4,7 @@ function [zstack] = LTDBReadImages(folderpath, channel_to_read, showbar)
 %channel to read (starting from 1), and a boolean parameter to display the
 %progress bar.
 %returns a 4D zstack (XYZT) as uint16.
+%Example: zstack = LTDBReadImages([LTDB_TIFF_PATH , 'LTDB001'], 1, 1);
     
     if ((folderpath(end) == '/') || (folderpath(end) == '\'))
         folderpath = folderpath(1:end-1);
@@ -53,14 +54,14 @@ function [zstack] = LTDBReadImages(folderpath, channel_to_read, showbar)
     for file = files'
         currfn = file.name;
         parts = strsplit(currfn,'_');
-        currT = parts{2}; currT = str2num(currT(2:end))+1;
-        currC = parts{3}; currC = str2num(currC(2:end))+1;
-        currD = parts{4}; currD = str2num(currD(2:end-4))+1;
+        currZ = parts{2}; currZ = str2num(currZ(2:end))+1;
+        currC = parts{3}; currC = str2num(currC(2:end))+1;        
+        currT = parts{4}; currT = str2num(currT(2:end-4))+1;
         if (currC == channel_to_read) 
-            if (currT <= T) && (currD <= D) && (currC <= C)
+            if (currT <= T) && (currZ <= Z) && (currC <= C)
                 Itemp = imread([folderpath,'/',currfn]);
-                if(size(Itemp) == size(zstack(:,:,currD,currT)))
-                    zstack(:,:,currD,currT) = Itemp;
+                if(size(Itemp) == size(zstack(:,:,currZ,currT)))
+                    zstack(:,:,currZ,currT) = Itemp;
                 else
                     errordlg(['Error in ', file.name]);
                     return;
